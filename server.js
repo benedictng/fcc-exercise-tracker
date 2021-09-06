@@ -61,14 +61,23 @@ app.get('/test', (req, res) => {
 )
 
 app.post('/api/users', (req,res) => {
-  createAndSaveUser(req.body.username,
-  function (err, data) {
-    if (err) {
-      return err;
-    }
-      res.send(data)
+
+  User.findOne({username: req.body.username}, (err, userFound) => {
+    console.log(userFound)
+    if (err) return console.log(err)
+    if (userFound) {
+      return res.send("username taken up")
+    } else {
+      createAndSaveUser(req.body.username,
+        function (err, data) {
+          if (err) {return err}
+        res.send(data)
+        })
+      }
+    })
   })
-})
+          
+
 
 
 app.get('/api/users', (req,res) => {
@@ -98,6 +107,10 @@ app.post('/api/users/:_id/exercises', (req,res) => {
     if (date.getTime() !== date.getTime()) {
       return res.send("Invalid Date")
     }
+    
+    if (typeof req.body.duration !== "number") {
+      return res.send("Duration should be a number")
+    }
 
     user.log.push({
       description: req.body.description,
@@ -105,8 +118,8 @@ app.post('/api/users/:_id/exercises', (req,res) => {
       date: date.toDateString(),
     })
 
-    user.count += 1
-    
+    user.count = user.log.length
+
     user.save((err,updatedUser) => {
       if(err) return console.log(err);
       var exercise = updatedUser.log[updatedUser.log.length-1]
