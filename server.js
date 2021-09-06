@@ -108,10 +108,11 @@ app.post('/api/users/:_id/exercises', (req,res) => {
       return res.send("Invalid Date")
     }
     
-    if (typeof req.body.duration !== "number") {
+    if (isNaN(parseInt(req.body.duration))) {
       return res.send("Duration should be a number")
     }
 
+  
     user.log.push({
       description: req.body.description,
       duration: req.body.duration,
@@ -119,6 +120,10 @@ app.post('/api/users/:_id/exercises', (req,res) => {
     })
 
     user.count = user.log.length
+
+
+
+
 
     user.save((err,updatedUser) => {
       if(err) return console.log(err);
