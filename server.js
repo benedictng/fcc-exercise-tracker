@@ -27,7 +27,7 @@ mongoose.connect(process.env['MONGO_URI'], { useNewUrlParser: true, useUnifiedTo
 
 const userSchema = new mongoose.Schema({
   username: String,
-  count: Number,
+  count: { type: Number, default: 0},
   log: [{
     description: String,
     duration: Number,
@@ -104,6 +104,9 @@ app.post('/api/users/:_id/exercises', (req,res) => {
       duration: req.body.duration,
       date: date.toDateString(),
     })
+
+    user.count += 1
+    
     user.save((err,updatedUser) => {
       if(err) return console.log(err);
       var exercise = updatedUser.log[updatedUser.log.length-1]
