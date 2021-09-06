@@ -71,21 +71,26 @@ app.post('/api/users', (req,res) => {
 })
 
 
-/*app.post('/api/users/:_id/exercises', (req,res) => {
-  console.log("posted")
-  res.send({
-    id: req.params._id,
-    description: req.body.description,
-    duration: req.body.duration,
-    date: req.body.date,
-  })
-})*/
+app.get('/api/users', (req,res) => {
+  console.log("api")
+  User.find({}, function(err, users) {
+    var userMap = [];
+
+    users.forEach(function(user) {
+      userMap.push(
+        {
+          username:user.username,
+          _id:user._id.toString()
+        }
+      )
+    });
+
+    res.send(userMap);  
+  });
+})
 
 app.post('/api/users/:_id/exercises', (req,res) => {
-  console.log(req.params._id)
-  var a = req.params._id
-  var id =  new mongoose.Types.ObjectId(a)
-  console.log(id)
+  var id =  new mongoose.Types.ObjectId(req.params._id)
   User.findById(id, (err, user) => {
     if (err) return console.log(err)
     user.log.push({
@@ -98,8 +103,14 @@ app.post('/api/users/:_id/exercises', (req,res) => {
       res.send(updatedUser)
     })
   })
-})
+});
 
-;
+app.get('/api/users/:_id/logs', (req,res) => {
+  var id =  new mongoose.Types.ObjectId(req.params._id)
+  User.findById(id, (err, user) => {
+    if (err) return console.log(err)
+    res.send(user)
+})
+})
 
 
