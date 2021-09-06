@@ -100,7 +100,15 @@ app.post('/api/users/:_id/exercises', (req,res) => {
     })
     user.save((err,updatedUser) => {
       if(err) return console.log(err);
-      res.send(updatedUser)
+      var exercise = updatedUser.logs[-1]
+      var result = {
+        username: updatedUser.username,
+        description: exercise.description,
+        duration: exercise.duration,
+        date: exercise.date,
+        _id: updatedUser._id.toString()
+      }
+      res.send(result)
     })
   })
 });
