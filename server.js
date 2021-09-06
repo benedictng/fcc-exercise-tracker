@@ -93,10 +93,16 @@ app.post('/api/users/:_id/exercises', (req,res) => {
   var id =  new mongoose.Types.ObjectId(req.params._id)
   User.findById(id, (err, user) => {
     if (err) return console.log(err)
+
+    var date = new Date(req.body.date)
+    if (date.getTime() !== date.getTime()) {
+      return res.send("Invalid Date")
+    }
+
     user.log.push({
       description: req.body.description,
       duration: req.body.duration,
-      date: req.body.date,
+      date: date,
     })
     user.save((err,updatedUser) => {
       if(err) return console.log(err);
