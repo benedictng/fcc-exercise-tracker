@@ -102,7 +102,7 @@ app.post('/api/users/:_id/exercises', (req,res) => {
     user.log.push({
       description: req.body.description,
       duration: req.body.duration,
-      date: date,
+      date: date.toDateString(),
     })
     user.save((err,updatedUser) => {
       if(err) return console.log(err);
@@ -122,9 +122,43 @@ app.post('/api/users/:_id/exercises', (req,res) => {
 
 app.get('/api/users/:_id/logs', (req,res) => {
   var id =  new mongoose.Types.ObjectId(req.params._id)
+  var from = req.query.from
+  var to = req.query.to
+  var limit = req.query.limit
   User.findById(id, (err, user) => {
     if (err) return console.log(err)
-    res.send(user)
+    var newlogs = [...user.log]
+    if (from) {
+      var dateFrom = new Date(from)
+      newlogs = newlogs.filter((x) => (
+        x.date > dateFrom
+      ))
+    }
+
+    if (to) {
+      var dateTo = new Date(to)
+      newlogs = newlogs.filter((x) => {
+        x.date > dateTo
+      })
+    }
+    newlogs = newlogs.sort((a,b) => a.date > b.date).map(x => ({
+      description: x.description,
+      duration: x.duration,
+      date: x.date
+    }))
+    var count = newlogs.length
+    if (newlogs.length > limit) {
+      newlogs.length = limit
+    }
+
+
+
+    res.json({
+      _id:id,
+      username:user.username,
+      count: count,
+      log: newlogs
+    })
 })
 })
 
